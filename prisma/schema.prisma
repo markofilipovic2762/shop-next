@@ -1,0 +1,98 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id String @id @default(uuid())
+  name String
+  email String @unique
+  password String
+  isAdmin Boolean
+  createdAt DateTime @default(now())
+  orders Order[]
+  reviews Review[]
+  shippingAddress ShippingAddress?
+}
+
+model Category {
+  id String @id @default(uuid())
+  name String
+  createdAt DateTime @default(now())
+  subcategories Subcategory[]
+  products Product[]
+}
+
+model Subcategory {
+  id String @id @default(uuid())
+  name String
+  categoryId String
+  category Category @relation(fields: [categoryId], references: [id])
+  createdAt DateTime @default(now())
+  products Product[]
+}
+
+model Product {
+  id String @id @default(uuid())
+  name String
+  price Float
+  description String
+  image String
+  categoryId String
+  category Category @relation(fields: [categoryId], references: [id])
+  createdAt DateTime @default(now())
+  subcategoryId String
+  subcategory Subcategory @relation(fields: [subcategoryId], references: [id])
+  orderProducts OrderProduct[]
+  reviews Review[]
+}
+
+model Order {
+  id String @id @default(uuid())
+  userId String
+  user User @relation(fields: [userId], references: [id])
+  totalPrice Float
+  createdAt DateTime @default(now())
+  orderProducts OrderProduct[]
+}
+
+model OrderProduct {
+  id String @id @default(uuid())
+  orderId String
+  order Order @relation(fields: [orderId], references: [id])
+  productId String 
+  product Product @relation(fields: [productId], references: [id])
+  quantity Int
+}
+
+model Review {
+  id String @id @default(uuid())
+  productId String
+  product Product @relation(fields: [productId], references: [id])
+  userId String
+  user User @relation(fields: [userId], references: [id])
+  rating Int
+  comment String
+}
+
+model ShippingAddress {
+  id String @id @default(uuid())
+  userId String @unique
+  user User @relation(fields: [userId], references: [id])
+  address String
+  city String
+  country String
+}
+
+
+
