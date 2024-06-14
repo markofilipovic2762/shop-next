@@ -20,14 +20,6 @@ export async function GET() {
 export async function POST(req:NextApiRequest, res: NextApiResponse) {
     const newUser = req?.body;
 
-    // const newUser = {
-    //     name: 'Marko',
-    //     email: 'rjwZt@example.com',
-    //     password: 'password',
-    //     isAdmin: true
-    // }
-
-
     try {
         await db.$connect();
         const user = await db.user.create({ data: {  ...newUser} });
@@ -39,3 +31,4 @@ export async function POST(req:NextApiRequest, res: NextApiResponse) {
         await db.$disconnect();
     }
 }
+

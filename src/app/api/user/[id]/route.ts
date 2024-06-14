@@ -1,6 +1,7 @@
 import db from "@/db/db";
 import { User } from "@prisma/client";
 import { NextResponse } from "next/server";
+import { NextApiRequest, NextApiResponse } from "next";
 
 /**
  * GET /api/user/{id}
@@ -36,4 +37,29 @@ export async function GET({
   }
 }
 
+export async function PUT(req: NextApiRequest,
+  {
+    params,
+  }: {
+    params: { id: string };
+  }
+): Promise<NextResponse> {
+  const id: string = params?.id;
+  const updatedUser = req?.body;
+  console.log({ updatedUser });
 
+  try {
+    await db.$connect();
+    await db.user.update({
+      where: { id },
+      data: { ...updatedUser },
+    });
+    return NextResponse.json(updatedUser);
+  } catch (error) {
+    db.$disconnect();
+    return NextResponse.json({ error: (error as Error).message });
+  } finally {
+    await db.$disconnect();
+    // }
+  }
+}
